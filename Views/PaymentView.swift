@@ -1,0 +1,236 @@
+//
+//  PaymentView.swift
+//  TravelApp
+//
+//  Created by Bohlale Manage on 2023/07/09.
+//
+
+import SwiftUI
+
+struct Detail: Identifiable {
+    let id = UUID()
+    var label: String
+    var value: String
+}
+
+struct SpecialRequest: Identifiable {
+    let id = UUID()
+    var label: String
+    var value: Int
+}
+
+struct PaymentView: View {
+    @Environment(\.presentationMode) var presentationMode;
+    @Environment(\.colorScheme) var colorScheme;
+    
+    @State var selection: Int = 0;
+    @State var selectedSpecialRequests: [Int] = [];
+    
+    var details: [Detail] = [
+        .init(label: "1x Superior Suite", value: "1 night stay"),
+        .init(label: "Check-in", value: "22 dec 2023"),
+        .init(label: "Check-out", value: "24June 2023"),
+        .init(label: "For", value: "1 Room, 2 Guests"),
+    ]
+    
+    var specialRequests: [SpecialRequest] = [
+        .init(label: "King bed", value: 0),
+        .init(label: "Non-smoking room", value: 1),
+        .init(label: "Queen bed", value: 2),
+        .init(label: "Smoking room", value: 3),
+        .init(label: "Twin beds", value: 4),
+    ]
+    
+    var body: some View {
+        VStack {
+            HStack {
+                Button {
+                    self.presentationMode.wrappedValue.dismiss()
+                } label: {
+                    Image(systemName: "chevron.left")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 20, height: 20)
+                        .background()
+                }
+                
+                Text("Payment")
+                    .frame(maxWidth: .infinity, alignment: .center)
+                    .offset(x: -10)
+                    .font(.title3)
+            }
+            .padding(.horizontal, 12)
+            .padding(.top, 6)
+            .padding(.bottom, 12)
+            .frame(maxWidth: .infinity)
+            
+            ScrollView(.vertical, showsIndicators: true) {
+                
+                HStack(alignment: .top, spacing: 0) {
+                    Image("paris")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(maxWidth: 70, maxHeight: 70)
+                        .cornerRadius(12)
+                    
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text("Paris.")
+                        
+                        Spacer()
+                        
+                        HStack {
+                            HStack {
+                                Image(systemName: "heart.fill")
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 12, height: 12)
+                                    .foregroundColor(.red)
+                                
+                                Text("4.8")
+                                    .foregroundColor(.black)
+                                    .font(.caption)
+                                    .bold()
+                            }
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 6)
+                            .background(RoundedRectangle(cornerRadius: 8).foregroundColor(Color("green")))
+                            
+                            Text("(4234 Reviews)")
+                                .font(.caption)
+                                .foregroundColor(.black)
+                                .padding(.leading, 4)
+                        }
+                    }
+                    .padding(.bottom, 1)
+                    .padding(.leading, 12)
+                    .frame(maxHeight: .infinity)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 16)
+                
+                ForEach(details) {detail in
+                    HStack {
+                        Text(detail.label)
+                            .foregroundColor(.gray)
+                            .font(.footnote)
+                        
+                        Spacer()
+                        
+                        Text(detail.value)
+                            .foregroundColor(.black)
+                            .font(.footnote)
+                    }
+                    .padding(.vertical, 14)
+                
+                    Rectangle()
+                        .frame(maxWidth: .infinity, maxHeight: 1).foregroundColor(.gray)
+                    .foregroundColor(Color("accent").opacity(colorScheme == .dark ? 0.4 : 0.15))
+                }
+                
+                HStack {
+                    Text("Total")
+                        .foregroundColor(.gray)
+                        .font(.footnote) + Text(" (with taxes & fee)")
+                        .foregroundColor(.gray)
+                        .font(.caption)
+                    
+                    Spacer()
+                    
+                    Text("R15 000")
+                        .foregroundColor(.black)
+                        .font(.footnote)
+                }
+                .padding(.vertical, 14)
+                
+                Text("Special Request")
+                    .foregroundColor(.black)
+                    .font(.body)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, 24)
+                    .padding(.bottom, 12)
+                
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: (getRect() - 48) * 0.4))], alignment: .leading, spacing: 0) {
+                    ForEach(specialRequests) { specialRequest in
+                        Button {
+                            if selectedSpecialRequests.contains(specialRequest.value) {
+                                let index = selectedSpecialRequests.firstIndex(of: specialRequest.value)
+                                if (index != nil) {
+                                    selectedSpecialRequests.remove(at: index ?? 0)
+                                }
+                            } else {
+                                selectedSpecialRequests.insert(specialRequest.value, at: 0)
+                            }
+                                
+                        } label: {
+                            HStack {
+                                RadioButton(isSelected: selectedSpecialRequests.contains(specialRequest.value))
+                                            
+                                Text(specialRequest.label)
+                                    .font(.footnote)
+                                    .foregroundColor(.gray)
+                            }
+                            .padding(.vertical, 6)
+                            .padding(.leading, 3)
+                            .padding(.bottom, 6)
+                        }
+
+                    }
+                }
+                
+                HStack {
+                    Text("Payment Method")
+                        .foregroundColor(.black)
+                        .font(.body)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(.top, 24)
+                    
+                    Spacer()
+                    
+                    NavigationLink {
+                        Text("d")
+                    } label: {
+                        Text("+ Add new card")
+                            .foregroundColor(.black)
+                            .font(.footnote)
+                            .padding(.top, 24)
+                    }
+
+                }
+                .padding(.bottom, 32)
+                .frame(maxWidth: .infinity)
+                
+                NavigationLink {
+                    Image("payment").resizable()
+                } label: {
+                    ButtonLabel(isDisabled: false, label: "Pay Now")
+                }
+            }
+            .padding(.horizontal, 12)
+        }
+        .padding(.horizontal, 12)
+        .navigationBarBackButtonHidden()
+        .navigationBarHidden(true)
+    }
+}
+
+struct PaymentView_Previews: PreviewProvider {
+    static var previews: some View {
+        PaymentView()
+    }
+}
+
+struct RadioButton: View {
+    var isSelected: Bool = false;
+    
+    var body: some View {
+        VStack {
+            if isSelected {
+                VStack {}
+                .frame(width: 12, height: 12)
+                .background(Circle().foregroundColor(Color("purple")))
+            }
+        }
+        .frame(width: 20, height: 20)
+        .background(Circle().stroke(Color("accent"), lineWidth: 1.5))
+    }
+}
